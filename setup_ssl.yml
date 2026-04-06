@@ -1,0 +1,21 @@
+{
+---
+- name: Task 2.2 - Automation with Ansible
+  hosts: localhost
+  become: yes
+  tasks:
+    - [cite_start]name: Install Nginx and Certbot [cite: 39, 42]
+      apt:
+        name: 
+          - nginx
+          - certbot
+          - python3-certbot-nginx
+        state: present
+        update_cache: yes
+
+    - [cite_start]name: Ensure Nginx is running [cite: 37]
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+}
