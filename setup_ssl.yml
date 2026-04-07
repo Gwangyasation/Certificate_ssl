@@ -1,21 +1,41 @@
-{
 ---
 - name: Task 2.2 - Automation with Ansible
   hosts: localhost
   become: yes
+  connection: local
+
   tasks:
-    - [cite_start]name: Install Nginx and Certbot [cite: 39, 42]
+    - name: Install Nginx and Certbot
       apt:
-        name: 
+        name:
           - nginx
           - certbot
           - python3-certbot-nginx
         state: present
         update_cache: yes
 
-    - [cite_start]name: Ensure Nginx is running [cite: 37]
+    - name: Ensure Nginx is running
       service:
         name: nginx
         state: started
         enabled: yes
-}
+
+    - name: Create SSL directory
+      file:
+        path: /etc/nginx/ssl
+        state: directory
+        mode: '0755'
+
+    - name: Generate self-signed certificate
+      command: >
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048
+        -keyout /etc/nginx/ssl/server.key
+        -out /etc/nginx/ssl/server.crt
+        -subj "/C=TH/ST=Bangkok/L=Bangkok/O=DevOps/OU=IT/CN=localhost"
+      args:
+        creates: /etc/nginx/ssl/server.crt
+
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
